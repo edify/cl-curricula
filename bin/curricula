@@ -1,0 +1,4 @@
+#!/usr/bin/node
+
+const curricula = require('../lib/curricula');
+curricula.main();
