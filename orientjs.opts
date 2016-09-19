@@ -1,0 +1,5 @@
+--cwd=./lib/db
+--dbname=cl-curr-dev
+--dbuser=cl_orient_user
+--dbpassword=cl_orient_pwd
+--port=2424
