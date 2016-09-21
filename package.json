@@ -4,7 +4,7 @@
   "description": "Common Library Curricula Micro Service",
   "main": "main.js",
   "scripts": {
-    "test": "mocha --reporter spec"
+    "test": "mocha --recursive --reporter spec"
   },
   "repository": {
     "type": "git",
@@ -27,13 +27,16 @@
     "bluebird": "^3.4.6",
     "bunyan": "^1.8.1",
     "bunyan-format": "^0.2.1",
+    "chai": "^3.5.0",
     "deasync": "^0.1.7",
     "denodeify": "^1.2.1",
     "lodash": "^4.15.0",
     "mocha": "^3.0.2",
     "node-uuid": "^1.4.7",
     "orientjs": "^2.2.2",
+    "proxyquire": "^1.7.10",
     "restify": "^4.1.1",
-    "restify-errors": "^4.2.3"
+    "restify-errors": "^4.2.3",
+    "sinon": "^1.17.6"
   }
 }
