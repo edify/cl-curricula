@@ -83,6 +83,7 @@ $ chmod +x bin/sauthc1_cli
 ```
 
 3. Use the script by passing the required arguments:
+
 ```bash
 $ ./bin/sauthc1_cli --url https://localhost:8443/api/v1/learningObjectives \
 --method POST \
@@ -96,10 +97,13 @@ $ ./bin/sauthc1_cli --url https://localhost:8443/api/v1/learningObjectives \
 ```
 
 The previous command will output a string:
-```
-{ Host: 'localhost:8443',
-  'X-Stormpath-Date': '20160905T154832Z',
-  Authorization: 'SAuthc1 sauthc1Id=5c4d6a3bdc68ffb02e3ce309964ac558/20160905/uYHxdluS6Q/sauthc1_request, sauthc1SignedHeaders=host;x-stormpath-date, sauthc1Signature=9111371712bdf41917303d638ac39c4d4b8099017a32704e9fc36911c4915f13' }
+
+```JSON
+{ 
+    "Host": "localhost:8443",
+    "X-Stormpath-Date": "20160905T154832Z",
+    "Authorization": "SAuthc1 sauthc1Id=5c4d6a3bdc68ffb02e3ce309964ac558/20160905/uYHxdluS6Q/sauthc1_request, sauthc1SignedHeaders=host;x-stormpath-date, sauthc1Signature=9111371712bdf41917303d638ac39c4d4b8099017a32704e9fc36911c4915f13" 
+}
 ```
 
 Then, you can use those values to build a cUrl request:
@@ -151,12 +155,13 @@ When the response status code is not 200, you will get a different response body
 | statusCode        | The HTTP status code                                                                                                  |
 
 JSON Example:
-```json
+
+```JSON
 { 
     statusCode: 404,
     body: { 
         code: 2003,
-        message: 'The item  does not exist in the folder tree of curriculum fcb71328-6ff3-42e4-b6a9-55666edds4a0.' 
+        message: "The item  does not exist in the folder tree of curriculum fcb71328-6ff3-42e4-b6a9-55666edds4a0." 
     } 
 }
 ```  
@@ -192,27 +197,28 @@ http://localhost:8081/curricula/{id}
 
 
 Resource JSON example
+
 ```json
 {
-    'name': 'CurriculumName',
-    'title': 'CurriculumTitle',
-    'discipline': 'CurriculumDiscipline',
-    'description': 'CurriculumDescription',
-    'enabled': true,
-    'metadata': {
-        'keywords': 'anyKeyWord',
-        'coverage': 'anyCoverage',
-        'context': 'ANY',
-        'difficulty': 'ANY',
-        'endUser': 'ANY',
-        'interactivityDegree': 'ANY',
-        'language': 'ENGLISH',
-        'status': 'ANY',
-        'author': 'anyAuthor',
-        'topic': 'anyTopic',
-        'isbn': 'anyISBN',
-        'price': 2000,
-        'extraMetadata': ['extraMetadata1', 'extraMetadata2']
+    "name": "CurriculumName",
+    "title": "CurriculumTitle",
+    "discipline": "CurriculumDiscipline",
+    "description": "CurriculumDescription",
+    "enabled": true,
+    "metadata": {
+        "keywords": "anyKeyWord",
+        "coverage": "anyCoverage",
+        "context": "ANY",
+        "difficulty": "ANY",
+        "endUser": "ANY",
+        "interactivityDegree": "ANY",
+        "language": "ENGLISH",
+        "status": "ANY",
+        "author": "anyAuthor",
+        "topic": "anyTopic",
+        "isbn": "anyISBN",
+        "price": 2000,
+        "extraMetadata": ["extraMetadata1", "extraMetadata2"]
     }
 }
 ```
@@ -600,24 +606,25 @@ Note: When the {path/to/desired/item} is not present, the root folder will be re
 
 
       - Resource JSON example
-```json
-{
-    "name": "LOName",
-    "title": "LearningObjectTitle",
-    "url": "/learningObjects/57e19c35185e1e8c93db6f61",
-    "contentUrl": "/learningObjects/57e19c35185e1e8c93db6f61/contents/57e19c35185e1e8c93db6f62/file/textandmaterials.html?refPath=57e19c35185e1e8c93db6f61/",
-    "learningObjectives": [
+      
+        ```json
         {
-            "name": "LearningObjective1",
-            "url": "/learningObjectives/id1"
-        },
-        {
-            "name": "LearningObjective2",
-            "url": "/learningObjectives/id2"
+            "name": "LOName",
+            "title": "LearningObjectTitle",
+            "url": "/learningObjects/57e19c35185e1e8c93db6f61",
+            "contentUrl": "/learningObjects/57e19c35185e1e8c93db6f61/contents/57e19c35185e1e8c93db6f62/file/textandmaterials.html?refPath=57e19c35185e1e8c93db6f61/",
+            "learningObjectives": [
+                {
+                    "name": "LearningObjective1",
+                    "url": "/learningObjectives/id1"
+                },
+                {
+                    "name": "LearningObjective2",
+                    "url": "/learningObjectives/id2"
+                }
+            ]
         }
-    ]
-}
-```
+        ```
 
 -  Folder
 
@@ -625,11 +632,12 @@ Note: When the {path/to/desired/item} is not present, the root folder will be re
 
 
       - Resource JSON example
-```json
-{
-    "name": "Unit1",
-}
-```
+      
+        ```json
+        {
+            "name": "Unit1",
+        }
+        ```
 
 ## Item Operations
 
