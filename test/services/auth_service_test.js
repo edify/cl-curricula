@@ -4,41 +4,9 @@
 
 const assert = require('assert');
 const chai = require('chai');
-const proxyquire = require('proxyquire').noCallThru();;
 const sinon = require('sinon');
 
-var logMock = {};
-
-//const apiKeyService = proxyquire('../../../cl-auth/cl-auth-js/lib/services/api_key_service');
-var authService = proxyquire('../../lib/services/auth_service', {'log': logMock});
-/*
-logMock.info = function(msg) {
-    console.log('JAMAS ', msg);
-};
-
-
-// Mock definitions.
-
-const redisMock = {
-    createClient(port) {}
-};
-
-
-
-const redisClientMock = {
-    hgetAsync(apiKeyId, apiSecretKey) {
-        return Promise.resolve('LN2qSArEGS3kI0CKGLNwM4T0neC9H6PALtb3yr9vGD3ep1ljviTsaEFD44Ti4TlT')
-    }
-};
-
-
-// Set mocks using rewire set function.
-//apiKeyService.__set__("redis", redisMock);
-//apiKeyService.redisClient = redisClientMock;
-//apiKeyService.passphrase = 'holacomoestas';
-
-
-authService.f();*/
+var authService;
 
 
 describe('Incoming request authentication', function() {
