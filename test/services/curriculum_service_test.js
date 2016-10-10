@@ -61,16 +61,17 @@ describe('Find curriculum by id', function() {
 
     it('Returns the desired curriculum when the id exists', function(done) {
 
-        queryMethod.returns(Promise.resolve(curriculum));
+        queryMethod.returns(Promise.resolve([curriculum]));
 
         curriculumService.findById('47c98e93-1709-4455-8303-096098513c1d').then(function(res) {
+            let queryParams = {params: {id: '47c98e93-1709-4455-8303-096098513c1d'}};
             let queryString = `SELECT id, name, title, discipline, description, enabled, metadata
                      FROM Curriculum
-                     WHERE id = '47c98e93-1709-4455-8303-096098513c1d'`;
+                     WHERE id = :id`;
 
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
-            queryMethod.should.have.been.calledWithExactly(queryString);
+            queryMethod.should.have.been.calledWithExactly(queryString, queryParams);
 
             // The result should be the test curriculum.
             (JSON.stringify(curriculum)).should.be.equal(JSON.stringify(res));
@@ -123,16 +124,17 @@ describe('Find all curricula', function() {
     });
 
     it('Returns all the curricula in database when the parameter all is true', function(done) {
+        let queryParams = {};
         let queryStr = 'SELECT id, name, title, discipline, description, enabled, metadata FROM Curriculum';
 
-        queryMethod.withArgs(queryStr).returns(Promise.resolve(curricula));
+        queryMethod.withArgs(queryStr, queryParams).returns(Promise.resolve(curricula));
 
         curriculumService.findAll(0, 0, true).then(function(res) {
 
             // Check methods invocation.
             queryMethod.should.have.been.calledTwice;
             queryMethod.should.have.been.calledWith(countQuery);
-            queryMethod.should.have.been.calledWith(queryStr);
+            queryMethod.should.have.been.calledWith(queryStr, queryParams);
 
             // The result should be the test curricula.
             JSON.stringify(res.content).should.be.equal(JSON.stringify(curricula));
@@ -151,15 +153,16 @@ describe('Find all curricula', function() {
     });
 
     it('Returns the correct page when the parameter all is false', function(done) {
-        let queryStr = 'SELECT id, name, title, discipline, description, enabled, metadata FROM Curriculum SKIP 0 LIMIT 1';
+        let queryParams = {params: {from: 0, size: 1}};
+        let queryStr = 'SELECT id, name, title, discipline, description, enabled, metadata FROM Curriculum SKIP :from LIMIT :size';
 
-        queryMethod.withArgs(queryStr).returns(Promise.resolve([curricula[0]]));
+        queryMethod.withArgs(queryStr, queryParams).returns(Promise.resolve([curricula[0]]));
 
         curriculumService.findAll(0, 1, false).then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledTwice;
             queryMethod.should.have.been.calledWith(countQuery);
-            queryMethod.should.have.been.calledWith(queryStr);
+            queryMethod.should.have.been.calledWith(queryStr, queryParams);
 
             // The result should be the first test curricula item.
             JSON.stringify(res.content).should.be.equal(JSON.stringify([curricula[0]]));
@@ -229,11 +232,12 @@ describe('Update a curriculum', function() {
         queryMethod.returns(Promise.resolve([1]));
 
         curriculumService.update('47c98e93-1709-4455-8303-096098513c1d', curriculum).then(function(res) {
-            let queryString = `UPDATE Curriculum MERGE ${JSON.stringify(curriculum)} WHERE id='47c98e93-1709-4455-8303-096098513c1d'`;
+            let queryParams = {params: {content: curriculum, id: '47c98e93-1709-4455-8303-096098513c1d'}};
+            let queryString = `UPDATE Curriculum MERGE :content WHERE id = :id`;
 
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
-            queryMethod.should.have.been.calledWithExactly(queryString);
+            queryMethod.should.have.been.calledWithExactly(queryString, queryParams);
 
             // The result should be an object with updatedRecords equals to 1.
             res.updatedRecords.should.be.equal(1);
@@ -279,11 +283,12 @@ describe('Delete a curriculum', function() {
         queryMethod.returns(Promise.resolve([1]));
 
         curriculumService.delete('47c98e93-1709-4455-8303-096098513c1d').then(function(res) {
-            let queryString = `DELETE VERTEX FROM (TRAVERSE OUT() FROM (SELECT FROM Curriculum WHERE id='47c98e93-1709-4455-8303-096098513c1d'))`;
+            let queryParams = {params: {id: '47c98e93-1709-4455-8303-096098513c1d'}};
+            let queryString = `DELETE VERTEX FROM (TRAVERSE OUT() FROM (SELECT FROM Curriculum WHERE id = :id))`;
 
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
-            queryMethod.should.have.been.calledWithExactly(queryString);
+            queryMethod.should.have.been.calledWithExactly(queryString, queryParams);
 
             // The result should be an object with deletedRecords equals to 1.
             res.deletedRecords.should.be.equal(1);
@@ -321,7 +326,7 @@ describe('Find curriculum by learning objective name', function() {
         queryMethod = sinon.stub(odbMock, 'query');
         queryString = `SELECT FROM 
                             (TRAVERSE in() FROM 
-                                (SELECT FROM LearningObject WHERE 'loName' in learningObjectives.name)) 
+                                (SELECT FROM LearningObject WHERE :loName in learningObjectives.name)) 
                      WHERE @class= 'Curriculum'`;
     });
 
@@ -331,11 +336,12 @@ describe('Find curriculum by learning objective name', function() {
 
     it('Retrieves all the matched curricula when the parameter all is true', function(done) {
         queryMethod.returns(Promise.resolve(curricula));
+        let queryParams = {params: {loName: 'loName'}};
 
         curriculumService.findByLearningObjective(0, 1, true, 'loName').then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
-            queryMethod.should.have.been.calledWithExactly(queryString);
+            queryMethod.should.have.been.calledWithExactly(queryString, queryParams);
 
             // The result should be the test curricula.
             JSON.stringify(res.content).should.be.equal(JSON.stringify(curricula));
@@ -355,11 +361,12 @@ describe('Find curriculum by learning objective name', function() {
 
     it('Retrieves the correct curricula page when the parameter all is false', function(done) {
         queryMethod.returns(Promise.resolve(curricula));
+        let queryParams = {params: {loName: 'loName'}};
 
         curriculumService.findByLearningObjective(0, 1, false, 'loName').then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
-            queryMethod.should.have.been.calledWithExactly(queryString);
+            queryMethod.should.have.been.calledWithExactly(queryString, queryParams);
 
             // The result should be the test curricula.
             JSON.stringify(res.content).should.be.equal(JSON.stringify([curricula[0]]));

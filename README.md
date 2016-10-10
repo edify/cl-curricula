@@ -16,6 +16,7 @@ $ npm install
 3.  You must set some environment variables before running the application:
 ```bash
 $ export CL_CURRICULA_PORT=8081
+$ export CL_CURRICULA_AUDIT=true    # For development purposes, if you want to log every request.
 $ export CL_ODB_NAME=cl-curr-dev
 $ export CL_ODB_HOST=localhost
 $ export CL_ODB_PORT=2434
@@ -37,6 +38,11 @@ $ export CL_AUTH_PASSPHRASE=stringUsedInTheBootstrapper
 ```bash
 $ chmod +x bin/curricula
 $ ./bin/curricula
+```
+
+6. Initialize the database scheme.
+```bash
+$ node_modules/orientjs/bin/orientjs migrate up
 ```
 
 
@@ -372,7 +378,6 @@ curl -k --request GET \
 ```json
 {
     "content": [{
-        "@type": "d",
         "id": "fcb71328-6ff3-42e4-b6a9-55666edd14a0",
         "name": "c1",
         "title": "title",
@@ -380,8 +385,6 @@ curl -k --request GET \
         "description": "CurriculumDescriptionUpdated2",
         "enabled": true,
         "metadata": {
-            "@class": "Metadata",
-            "@type": "d",
             "keywords": "anyKeyWordUpdated",
             "coverage": "anyCoverage",
             "context": "ANY",
@@ -396,10 +399,7 @@ curl -k --request GET \
             "price": 2000,
             "extraMetadata": ["extraMetadata1", "extraMetadata2"]
         },
-        "@rid": "#-2:0",
-        "@version": 0
     }, {
-        "@type": "d",
         "id": "1fe8b1b7-4f7e-4928-a0b2-571ad88652b8",
         "name": "c1",
         "title": "title",
@@ -407,8 +407,6 @@ curl -k --request GET \
         "description": "CurriculumDescriptionUpdated2",
         "enabled": true,
         "metadata": {
-            "@class": "Metadata",
-            "@type": "d",
             "topic": "anyTopic",
             "author": "anyAuthor",
             "endUser": "ANY",
@@ -423,8 +421,6 @@ curl -k --request GET \
             "language": "ENGLISH",
             "interactivityDegree": "ANY"
         },
-        "@rid": "#-2:1",
-        "@version": 0
     }],
     "firstPage": true,
     "lastPage": false,

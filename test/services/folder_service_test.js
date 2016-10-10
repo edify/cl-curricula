@@ -114,15 +114,18 @@ describe('Find item by path', function() {
         let itemPath = ['subfolder1', 'subfolder2'];
         let currId = '47c98e93-1709-4455-8303-096098513c1d';
 
-        let queryString = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id='${currId}')) WHERE name='root'`;
-        _.forEach(itemPath, function(itemName) {
-            queryString = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${queryString})) WHERE name='${itemName}'`
+        let queryParams = {params: {curriculumId: currId}};
+        let queryString = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id = :curriculumId)) WHERE name='root'`;
+        _.forEach(itemPath, function(itemName, index) {
+            let subItem = `item${index}`;
+            queryParams.params[subItem] = itemName;
+            queryString = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${queryString})) WHERE name = :${subItem}`
         });
 
         folderService.findByPath(currId, itemPath).then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
-            queryMethod.should.have.been.calledWithExactly(queryString);
+            queryMethod.should.have.been.calledWithExactly(queryString, queryParams);
 
             // The result should be the test folder.
             (JSON.stringify(folder)).should.be.equal(JSON.stringify(res));
@@ -138,15 +141,18 @@ describe('Find item by path', function() {
         let itemPath = ['subfolder1', 'loName'];
         let currId = '47c98e93-1709-4455-8303-096098513c1d';
 
-        let queryString = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id='${currId}')) WHERE name='root'`;
-        _.forEach(itemPath, function(itemName) {
-            queryString = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${queryString})) WHERE name='${itemName}'`
+        let queryParams = {params: {curriculumId: currId}};
+        let queryString = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id = :curriculumId)) WHERE name='root'`;
+        _.forEach(itemPath, function(itemName, index) {
+            let subItem = `item${index}`;
+            queryParams.params[subItem] = itemName;
+            queryString = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${queryString})) WHERE name = :${subItem}`
         });
 
         folderService.findByPath(currId, itemPath).then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
-            queryMethod.should.have.been.calledWithExactly(queryString);
+            queryMethod.should.have.been.calledWithExactly(queryString, queryParams);
 
             // The result should be the test learningObject.
             (JSON.stringify(learningObject)).should.be.equal(JSON.stringify(res));
@@ -163,31 +169,36 @@ describe('Find item by path', function() {
             let itemPath = ['subfolder1', 'subfolder2'];
             let currId = '47c98e93-1709-4455-8303-096098513c1d';
 
-            let queryString = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id='${currId}')) WHERE name='root'`;
-            _.forEach(itemPath, function(itemName) {
-                queryString = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${queryString})) WHERE name='${itemName}'`
+            let queryParams = {params: {curriculumId: currId}};
+            let queryString = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id = :curriculumId)) WHERE name='root'`;
+            _.forEach(itemPath, function(itemName, index) {
+                let subItem = `item${index}`;
+                queryParams.params[subItem] = itemName;
+                queryString = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${queryString})) WHERE name = :${subItem}`
             });
 
+            let subFoldersQueryParams = {params: {id: folder.id}};
             let subFoldersQuery = `SELECT id, name FROM 
-                        (SELECT EXPAND(OUT()) FROM (SELECT FROM Folder WHERE id='${folder.id}')) 
+                        (SELECT EXPAND(OUT()) FROM (SELECT FROM Folder WHERE id = :id)) 
                             WHERE @class='Folder'`;
 
+            let loQueryParams = {params: {id: folder.id}};
             let learningObjectsQuery = `SELECT id, name, title, url, contentUrl, learningObjectives 
-                        FROM (SELECT EXPAND(OUT()) FROM (SELECT FROM Folder WHERE id='${folder.id}')) 
+                        FROM (SELECT EXPAND(OUT()) FROM (SELECT FROM Folder WHERE id = :id)) 
                             WHERE @class='LearningObject'`;
 
             // Change method return values.
-            queryMethod.withArgs(queryString).returns(Promise.resolve([folder]));
-            queryMethod.withArgs(subFoldersQuery).returns(Promise.resolve(folders));
-            queryMethod.withArgs(learningObjectsQuery).returns(Promise.resolve(learningObjects));
+            queryMethod.withArgs(queryString, queryParams).returns(Promise.resolve([folder]));
+            queryMethod.withArgs(subFoldersQuery, subFoldersQueryParams).returns(Promise.resolve(folders));
+            queryMethod.withArgs(learningObjectsQuery, loQueryParams).returns(Promise.resolve(learningObjects));
 
             folderService.findByPath(currId, itemPath, ['folders', 'learningObjects']).then(function(res) {
 
                 // Check methods invocation.
                 queryMethod.should.have.been.calledThrice;
-                queryMethod.should.have.been.calledWith(queryString);
-                queryMethod.should.have.been.calledWith(learningObjectsQuery);
-                queryMethod.should.have.been.calledWith(subFoldersQuery);
+                queryMethod.should.have.been.calledWith(queryString, queryParams);
+                queryMethod.should.have.been.calledWith(learningObjectsQuery, loQueryParams);
+                queryMethod.should.have.been.calledWith(subFoldersQuery, subFoldersQueryParams);
 
                 // The result should be the test folder.
                 res.id.should.be.equal(folder.id);
@@ -207,14 +218,16 @@ describe('Find item by path', function() {
             let itemPath = [];
             let currId = '47c98e93-1709-4455-8303-096098513c1d';
 
-            let queryString = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id='${currId}')) WHERE name='root'`;
+            let queryParams = {params: {curriculumId: currId}};
+            let queryString = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id = :curriculumId)) WHERE name='root'`;
 
             let loUrl = learningObject.url;
             let loContentsUrl = `${loUrl}/contents`;
             let urlSplit = learningObject.contentUrl.split('?');
             let loBase64Url = `${urlSplit[0]}/base64?${urlSplit[1]}`;
 
-            queryMethod.withArgs(queryString).returns(Promise.resolve([learningObject]));
+            console.log(queryString);
+            queryMethod.withArgs(queryString, queryParams).returns(Promise.resolve([learningObject]));
             clientGetMethod.withArgs(loUrl).returns(Promise.resolve({metadata: loMetadata}));
             clientGetMethod.withArgs(loContentsUrl).returns(Promise.resolve(loContents));
             clientGetMethod.withArgs(loBase64Url).returns(Promise.resolve({base64: 'BASE64String'}));
@@ -223,7 +236,7 @@ describe('Find item by path', function() {
 
                 // Check methods invocation.
                 queryMethod.should.have.been.calledOnce;
-                queryMethod.should.have.been.calledWith(queryString);
+                queryMethod.should.have.been.calledWith(queryString, queryParams);
                 clientGetMethod.should.have.been.calledThrice;
                 clientGetMethod.should.have.been.calledWith(loUrl);
                 clientGetMethod.should.have.been.calledWith(loContentsUrl);
@@ -252,9 +265,12 @@ describe('Find item by path', function() {
         let currId = '47c98e93-1709-4455-8303-096098513c1d';
         let itemPath = ['unknownItem'];
 
-        let queryString = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id='${currId}')) WHERE name='root'`;
-        _.forEach(itemPath, function(itemName) {
-            queryString = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${queryString})) WHERE name='${itemName}'`
+        let queryParams = {params: {curriculumId: currId}};
+        let queryString = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id = :curriculumId)) WHERE name='root'`;
+        _.forEach(itemPath, function(itemName, index) {
+            let subItem = `item${index}`;
+            queryParams.params[subItem] = itemName;
+            queryString = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${queryString})) WHERE name = :${subItem}`
         });
 
         folderService.findByPath(currId, itemPath).catch(function(err) {
@@ -302,23 +318,28 @@ describe('Insert new item', function() {
         let letChainedLetMethod = sinon.stub(letMock, 'let', function() {return letMock;});
         let odbLet = sinon.stub(odbMock, 'let', function() {return letMock;});
 
-        let rootQuery = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id='${currId}')) WHERE name='root'`;
-        let getChildQuery = `SELECT FROM (SELECT EXPAND(OUT()) 
-                                FROM (SELECT FROM Folder WHERE id='${folder.id}')) WHERE name='subfolder1'`;
-        let containsItemQuery = `SELECT @rid FROM (SELECT EXPAND(OUT()) FROM 
-                        (SELECT FROM Folder WHERE id='${folder.id}')) 
-                            WHERE name='${learningObject.name}'`;
+        let rootQueryParams = {params: {curriculumId: currId}};
+        let rootQuery = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id = :curriculumId)) WHERE name='root'`;
 
-        queryMethod.withArgs(rootQuery).returns(Promise.resolve([folder]));
-        queryMethod.withArgs(getChildQuery).returns(Promise.resolve([folder]));
-        queryMethod.withArgs(containsItemQuery).returns(Promise.resolve([]));
+        let getChildQueryParams = {params: {id: folder.id, name: 'subfolder1'}};
+        let getChildQuery = `SELECT FROM (SELECT EXPAND(OUT()) 
+                                FROM (SELECT FROM Folder WHERE id = :id)) WHERE name = :name`;
+
+        let containsItemParams = {params: {id: folder.id, name: learningObject.name}};
+        let containsItemQuery = `SELECT @rid FROM (SELECT EXPAND(OUT()) FROM 
+                        (SELECT FROM Folder WHERE id = :id)) 
+                            WHERE name = :name`;
+
+        queryMethod.withArgs(rootQuery, rootQueryParams).returns(Promise.resolve([folder]));
+        queryMethod.withArgs(getChildQuery, getChildQueryParams).returns(Promise.resolve([folder]));
+        queryMethod.withArgs(containsItemQuery, containsItemParams).returns(Promise.resolve([]));
 
 
         folderService.insertForce(currId, itemPath, learningObject).then(function(res) {
             // Check methods invocation.
-            queryMethod.should.have.been.calledWith(rootQuery);         // The root folder is retrieved before checking the path.
-            queryMethod.should.have.been.calledWith(getChildQuery);     // FindLastValidFolder method executes this query.
-            queryMethod.should.have.been.calledWith(containsItemQuery); // SaveItem method executes this query.
+            queryMethod.should.have.been.calledWith(rootQuery, rootQueryParams);         // The root folder is retrieved before checking the path.
+            queryMethod.should.have.been.calledWith(getChildQuery, getChildQueryParams);     // FindLastValidFolder method executes this query.
+            queryMethod.should.have.been.calledWith(containsItemQuery, containsItemParams); // SaveItem method executes this query.
 
             odbLet.should.have.been.calledOnce;                 // Item vertex creation.
             letChainedLetMethod.should.have.been.calledOnce;    // Edge between parent folder and the new item.
@@ -381,28 +402,33 @@ describe('Update item', function() {
         let currId = 'currId';
         let itemPath = ['subfolder1', 'folderName'];
 
-        let findItemByPathQuery = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id='${currId}')) WHERE name='root'`;
-        _.forEach(itemPath, function(itemName) {
-            findItemByPathQuery = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${findItemByPathQuery})) WHERE name='${itemName}'`
+        let findItemQueryParams = {params: {curriculumId: currId}};
+        let findItemByPathQuery = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id = :curriculumId)) WHERE name='root'`;
+        _.forEach(itemPath, function(itemName, index) {
+            let subItem = `item${index}`;
+            findItemQueryParams.params[subItem] = itemName;
+            findItemByPathQuery = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${findItemByPathQuery})) WHERE name = :${subItem}`
         });
 
+        let containsItemQueryParams = {params: {id: folder.id, name: folder.name}};
         let parentContainsItemQuery = `SELECT @rid FROM (SELECT EXPAND(IN().OUT()) FROM 
-                        (SELECT FROM Folder WHERE id='${folder.id}')) 
-                            WHERE not(id='${folder.id}') and name='${folder.name}'`;
+                        (SELECT FROM Folder WHERE id = :id)) 
+                            WHERE not(id = :id) and name = :name`;
 
-        let queryString = `UPDATE Folder MERGE ${JSON.stringify(folder)} WHERE id='47c98e93-1709-4455-8303-096098513c1d'`;
+        let queryParams = {params: {itemClass: 'Folder', content: folder, id: '47c98e93-1709-4455-8303-096098513c1d'}};
+        let queryString = `UPDATE :itemClass MERGE :content WHERE id = :id`;
 
-        queryMethod.withArgs(findItemByPathQuery).returns(Promise.resolve([folder]));
+        queryMethod.withArgs(findItemByPathQuery, findItemQueryParams).returns(Promise.resolve([folder]));
         // The query result will be an empty array because the item does not exist inside the parentsFolder.
-        queryMethod.withArgs(parentContainsItemQuery).returns(Promise.resolve([]));
-        queryMethod.withArgs(queryString).returns(Promise.resolve([1]));
+        queryMethod.withArgs(parentContainsItemQuery, containsItemQueryParams).returns(Promise.resolve([]));
+        queryMethod.withArgs(queryString, queryParams).returns(Promise.resolve([1]));
 
         folderService.update('currId', itemPath, folder).then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledThrice;
-            queryMethod.should.have.been.calledWith(findItemByPathQuery);
-            queryMethod.should.have.been.calledWith(parentContainsItemQuery);
-            queryMethod.should.have.been.calledWith(queryString);
+            queryMethod.should.have.been.calledWith(findItemByPathQuery, findItemQueryParams);
+            queryMethod.should.have.been.calledWith(parentContainsItemQuery, containsItemQueryParams);
+            queryMethod.should.have.been.calledWith(queryString, queryParams);
 
             // The result should be an object with updatedRecords equals to 1.
             res.updatedRecords.should.be.equal(1);
@@ -417,13 +443,16 @@ describe('Update item', function() {
         let currId = 'currId';
         let itemPath = ['subfolder1', 'loName'];
 
-        let findItemByPathQuery = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id='${currId}')) WHERE name='root'`;
-        _.forEach(itemPath, function(itemName) {
-            findItemByPathQuery = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${findItemByPathQuery})) WHERE name='${itemName}'`
+        let findItemQueryParams = {params: {curriculumId: currId}};
+        let findItemByPathQuery = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id = :curriculumId)) WHERE name='root'`;
+        _.forEach(itemPath, function(itemName, index) {
+            let subItem = `item${index}`;
+            findItemQueryParams.params[subItem] = itemName;
+            findItemByPathQuery = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${findItemByPathQuery})) WHERE name = :${subItem}`
         });
 
         // The query result will be an empty array because the item was not found.
-        queryMethod.withArgs(findItemByPathQuery).returns(Promise.resolve([]));
+        queryMethod.withArgs(findItemByPathQuery, findItemQueryParams).returns(Promise.resolve([]));
 
         folderService.update(currId, itemPath, folder).catch(function(err) {
             // Custom error must be thrown.
@@ -455,21 +484,25 @@ describe('Delete an item', function() {
         let currId = 'currId';
         let itemPath = ['subfolder1', 'loName'];
 
-        let findItemByPathQuery = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id='${currId}')) WHERE name='root'`;
-        _.forEach(itemPath, function(itemName) {
-            findItemByPathQuery = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${findItemByPathQuery})) WHERE name='${itemName}'`
+        let findItemQueryParams = {params: {curriculumId: currId}};
+        let findItemByPathQuery = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id = :curriculumId)) WHERE name='root'`;
+        _.forEach(itemPath, function(itemName, index) {
+            let subItem = `item${index}`;
+            findItemQueryParams.params[subItem] = itemName;
+            findItemByPathQuery = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${findItemByPathQuery})) WHERE name = :${subItem}`
         });
 
-        let queryString = `DELETE VERTEX FROM (TRAVERSE OUT() FROM (SELECT FROM V WHERE id='${folder.id}'))`;
+        let queryParams = {params: {id: folder.id}};
+        let queryString = `DELETE VERTEX FROM (TRAVERSE OUT() FROM (SELECT FROM V WHERE id = :id))`;
 
-        queryMethod.withArgs(findItemByPathQuery).returns(Promise.resolve([folder]));
-        queryMethod.withArgs(queryString).returns(Promise.resolve([1]));
+        queryMethod.withArgs(findItemByPathQuery, findItemQueryParams).returns(Promise.resolve([folder]));
+        queryMethod.withArgs(queryString, queryParams).returns(Promise.resolve([1]));
 
         folderService.delete(currId, itemPath).then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledTwice;
-            queryMethod.should.have.been.calledWith(findItemByPathQuery);
-            queryMethod.should.have.been.calledWith(queryString);
+            queryMethod.should.have.been.calledWith(findItemByPathQuery, findItemQueryParams);
+            queryMethod.should.have.been.calledWith(queryString, queryParams);
 
             // The result should be an object with updatedRecords equals to 1.
             res.deletedRecords.should.be.equal(1);
@@ -485,13 +518,16 @@ describe('Delete an item', function() {
         let currId = 'currId';
         let itemPath = ['subfolder1', 'loName'];
 
-        let findItemByPathQuery = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id='${currId}')) WHERE name='root'`;
-        _.forEach(itemPath, function(itemName) {
-            findItemByPathQuery = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${findItemByPathQuery})) WHERE name='${itemName}'`
+        let findItemQueryParams = {params: {curriculumId: currId}};
+        let findItemByPathQuery = `SELECT FROM(SELECT EXPAND(OUT()) FROM (SELECT FROM Curriculum WHERE id = :curriculumId)) WHERE name='root'`;
+        _.forEach(itemPath, function(itemName, index) {
+            let subItem = `item${index}`;
+            findItemQueryParams.params[subItem] = itemName;
+            findItemByPathQuery = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${findItemByPathQuery})) WHERE name = :${subItem}`
         });
 
         // The query result will be an empty array because the item was not found.
-        queryMethod.withArgs(findItemByPathQuery).returns(Promise.resolve([]));
+        queryMethod.withArgs(findItemByPathQuery, findItemQueryParams).returns(Promise.resolve([]));
 
         folderService.delete(currId, itemPath).catch(function(err) {
             // Custom error must be thrown.
