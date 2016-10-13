@@ -258,7 +258,7 @@ describe('Find item by path', function() {
         });
     });
 
-    it('Throws a not found error when the path is invalid', function(done) {
+    it('Returns an empty object when the item does not exist', function(done) {
         // The query result will be an empty array because the item was not found.
         queryMethod.returns(Promise.resolve([]));
 
@@ -273,13 +273,11 @@ describe('Find item by path', function() {
             queryString = `SELECT FROM (SELECT EXPAND(OUT()) FROM (${queryString})) WHERE name = :${subItem}`
         });
 
-        folderService.findByPath(currId, itemPath).catch(function(err) {
+        folderService.findByPath(currId, itemPath).then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
 
-            // Custom error must be thrown.
-            err.statusCode.should.be.equal(404);
-            err.body.message.should.be.equal(`The item unknownItem does not exist in the folder tree of curriculum ${currId}.`);
+            JSON.stringify(res).should.be.equal('{}');
 
             done()
         }).catch(function(err) {
@@ -362,20 +360,18 @@ describe('Insert new item', function() {
 
     });
 
-    it('Throws an error if the path is not valid', function(done) {
+    it('Returns an empty object when the path is not valid', function(done) {
         // The query result will be an empty array because the item was not found.
         queryMethod.returns(Promise.resolve([]));
 
         let currId = '47c98e93-1709-4455-8303-096098513c1d';
         let itemPath = ['subfolder1', 'unknownFolder'];
 
-        folderService.insertForce(currId, itemPath, folder).catch(function(err) {
+        folderService.insertForce(currId, itemPath, folder).then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
 
-            // Custom error must be thrown.
-            err.statusCode.should.be.equal(404);
-            err.body.message.should.be.equal(`The item  does not exist in the folder tree of curriculum ${currId}.`);
+            JSON.stringify(res).should.be.equal('{}');
 
             done()
         }).catch(function(err) {
@@ -415,8 +411,8 @@ describe('Update item', function() {
                         (SELECT FROM Folder WHERE id = :id)) 
                             WHERE not(id = :id) and name = :name`;
 
-        let queryParams = {params: {itemClass: 'Folder', content: folder, id: '47c98e93-1709-4455-8303-096098513c1d'}};
-        let queryString = `UPDATE :itemClass MERGE :content WHERE id = :id`;
+        let queryParams = {params: {content: folder, id: '47c98e93-1709-4455-8303-096098513c1d'}};
+        let queryString = `UPDATE Folder MERGE :content WHERE id = :id`;
 
         queryMethod.withArgs(findItemByPathQuery, findItemQueryParams).returns(Promise.resolve([folder]));
         // The query result will be an empty array because the item does not exist inside the parentsFolder.
@@ -439,7 +435,7 @@ describe('Update item', function() {
         })
     });
 
-    it('Throws a not found error when the id does not exist', function(done) {
+    it('Returns 0 updated records when the item does not exist', function(done) {
         let currId = 'currId';
         let itemPath = ['subfolder1', 'loName'];
 
@@ -454,10 +450,8 @@ describe('Update item', function() {
         // The query result will be an empty array because the item was not found.
         queryMethod.withArgs(findItemByPathQuery, findItemQueryParams).returns(Promise.resolve([]));
 
-        folderService.update(currId, itemPath, folder).catch(function(err) {
-            // Custom error must be thrown.
-            err.statusCode.should.be.equal(404);
-            err.body.message.should.be.equal('The item subfolder1/loName does not exist in the folder tree of curriculum currId.');
+        folderService.update(currId, itemPath, folder).then(function(res) {
+            res.updatedRecords.should.be.equal(0);
 
             done()
         }).catch(function(err) {
@@ -498,7 +492,7 @@ describe('Delete an item', function() {
         queryMethod.withArgs(findItemByPathQuery, findItemQueryParams).returns(Promise.resolve([folder]));
         queryMethod.withArgs(queryString, queryParams).returns(Promise.resolve([1]));
 
-        folderService.delete(currId, itemPath).then(function(res) {
+        folderService.remove(currId, itemPath).then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledTwice;
             queryMethod.should.have.been.calledWith(findItemByPathQuery, findItemQueryParams);
@@ -514,7 +508,7 @@ describe('Delete an item', function() {
 
     });
 
-    it('Throws a not found error when the item does not exist', function(done) {
+    it('Return 0 deleted records when the item does not exist', function(done) {
         let currId = 'currId';
         let itemPath = ['subfolder1', 'loName'];
 
@@ -529,10 +523,8 @@ describe('Delete an item', function() {
         // The query result will be an empty array because the item was not found.
         queryMethod.withArgs(findItemByPathQuery, findItemQueryParams).returns(Promise.resolve([]));
 
-        folderService.delete(currId, itemPath).catch(function(err) {
-            // Custom error must be thrown.
-            err.statusCode.should.be.equal(404);
-            err.body.message.should.be.equal('The item subfolder1/loName does not exist in the folder tree of curriculum currId.');
+        folderService.remove(currId, itemPath).then(function(res) {
+            res.deletedRecords.should.be.equal(0);
 
             done()
         }).catch(function(err) {

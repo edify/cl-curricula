@@ -83,22 +83,16 @@ describe('Find curriculum by id', function() {
 
     });
 
-    it('Throws a not found error when the id does not exist', function(done) {
+    it('The result is empty when the curriculum does not exist', function(done) {
         // Return empty results.
         queryMethod.returns(Promise.resolve([]));
 
-        let queryString = `SELECT id, name, title, discipline, description, enabled, metadata
-                     FROM Curriculum
-                     WHERE id = 'UnknownId'`;
-
-        curriculumService.findById('UnknownId').catch(function(err) {
+        curriculumService.findById('UnknownId').then(function(res) {
 
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
 
-            // Custom error must be thrown.
-            err.statusCode.should.be.equal(404);
-            err.body.message.should.be.equal('The curriculum with id UnknownId was not found.');
+            JSON.stringify(res).should.be.equal('{}');
 
             done()
         }).catch(function(err) {
@@ -248,16 +242,14 @@ describe('Update a curriculum', function() {
         })
     });
 
-    it('Throws a not found error when the id does not exist', function(done) {
+    it('Returns 0 records updated when the curriculum does not exist', function(done) {
         queryMethod.returns(Promise.resolve([0]));
 
-        curriculumService.update('UnknownId', curriculum).catch(function(err) {
+        curriculumService.update('UnknownId', curriculum).then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
 
-            // Custom error must be thrown.
-            err.statusCode.should.be.equal(404);
-            err.body.message.should.be.equal('The curriculum with id UnknownId was not found.');
+            res.updatedRecords.should.be.equal(0);
 
             done()
         }).catch(function(err) {
@@ -282,7 +274,7 @@ describe('Delete a curriculum', function() {
     it('Delete the curriculum when the id exists', function(done) {
         queryMethod.returns(Promise.resolve([1]));
 
-        curriculumService.delete('47c98e93-1709-4455-8303-096098513c1d').then(function(res) {
+        curriculumService.remove('47c98e93-1709-4455-8303-096098513c1d').then(function(res) {
             let queryParams = {params: {id: '47c98e93-1709-4455-8303-096098513c1d'}};
             let queryString = `DELETE VERTEX FROM (TRAVERSE OUT() FROM (SELECT FROM Curriculum WHERE id = :id))`;
 
@@ -299,16 +291,14 @@ describe('Delete a curriculum', function() {
         })
     });
 
-    it('Throws a not found error when the id does not exist', function(done) {
+    it('Returns 0 removed records when the curriculum does not exist', function(done) {
         queryMethod.returns(Promise.resolve([0]));
 
-        curriculumService.delete('UnknownId').catch(function(err) {
+        curriculumService.remove('UnknownId').then(function(res) {
             // Check methods invocation.
             queryMethod.should.have.been.calledOnce;
 
-            // Custom error must be thrown.
-            err.statusCode.should.be.equal(404);
-            err.body.message.should.be.equal('The curriculum with id UnknownId was not found.');
+            res.deletedRecords.should.be.equal(0);
 
             done()
         }).catch(function(err) {
