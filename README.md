@@ -159,6 +159,7 @@ When the response status code is not 200, you will get a different response body
 | code              | A Common Library-specific error code that can be used to obtain detailed information.                                 |
 | message           | An understandable user friendly message explaining what happened with the request.                                    |
 | statusCode        | The HTTP status code                                                                                                  |
+| requestId         | Unique identifier that will be helpful for searching in the log files.                                                |
 
 JSON Example:
 
