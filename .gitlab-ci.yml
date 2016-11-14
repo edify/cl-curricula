@@ -1,0 +1,11 @@
+stages:
+  - test
+
+test-debug-js:
+  image: node
+  stage: test
+  except:
+    - master
+  script:
+    - npm install
+    - npm test
