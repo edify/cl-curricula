@@ -13,7 +13,7 @@ sinon.stub(apiKeyServiceMock, 'getApiSecretKey', function() {
     return Promise.resolve('6de725ae0e53bbfc102acdc16efd366d21f76b7d')
 });
 
-mockRequire('../../../cl-auth/cl-auth-js/lib/services/api_key_service', apiKeyServiceMock);
+mockRequire('../../../cl-auth-js/lib/services/api_key_service', apiKeyServiceMock);
 mockRequire('../../lib/utils/log', {info(str) {}});
 
 // Require service that will be tested.
