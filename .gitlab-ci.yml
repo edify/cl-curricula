@@ -2,10 +2,10 @@ stages:
   - test
 
 test-debug-js:
-  image: node
+  image: node:6.9.1
   stage: test
-  except:
-    - master
   script:
+    - curl -u$ARTIFACTORY_USERNAME:$ARTIFACTORY_PASSWORD https://edify.jfrog.io/edify/api/npm/auth > ~/.npmrc
+    - echo registry=http://edify.jfrog.io/edify/api/npm/npm-edify >> ~/.npmrc
     - npm install
     - npm test

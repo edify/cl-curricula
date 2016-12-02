@@ -7,14 +7,25 @@ const mockRequire = require('mock-require');
 const sinon = require('sinon');
 
 // Mocking dependencies.
-const apiKeyServiceMock = {getApiSecretKey: function(){}};
+const clAuthMock = {
+    apiKeyService: {
+        getApiSecretKey() {
+            return Promise.resolve('6de725ae0e53bbfc102acdc16efd366d21f76b7d')
+        }
+    },
+    sauthc1: {
+        sign(headers, method, requestURL, body, date, credentials, nonce) {
+            return 'SAuthc1 sauthc1Id=5c4d6a3bdc68ffb02e3ce309964ac558/20160913/SwXjqNYRao0FVnx/sauthc1_request, ' +
+                    'sauthc1SignedHeaders=host;x-stormpath-date, ' +
+                    'sauthc1Signature=b1b5498294187cb1e14fbf222f795edc7a37a4db8b2f018d6d3b85b2c1e81d69';
+        }
+    }
+};
 
-sinon.stub(apiKeyServiceMock, 'getApiSecretKey', function() {
-    return Promise.resolve('6de725ae0e53bbfc102acdc16efd366d21f76b7d')
-});
 
-mockRequire('../../../cl-auth-js/lib/services/api_key_service', apiKeyServiceMock);
+mockRequire('cl-auth-js', clAuthMock);
 mockRequire('../../lib/utils/log', {info(str) {}});
+
 
 // Require service that will be tested.
 const authService = require('../../lib/services/auth_service');

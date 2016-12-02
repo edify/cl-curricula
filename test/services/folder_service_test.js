@@ -226,7 +226,6 @@ describe('Find item by path', function() {
             let urlSplit = learningObject.contentUrl.split('?');
             let loBase64Url = `${urlSplit[0]}/base64?${urlSplit[1]}`;
 
-            console.log(queryString);
             queryMethod.withArgs(queryString, queryParams).returns(Promise.resolve([learningObject]));
             clientGetMethod.withArgs(loUrl).returns(Promise.resolve({metadata: loMetadata}));
             clientGetMethod.withArgs(loContentsUrl).returns(Promise.resolve(loContents));

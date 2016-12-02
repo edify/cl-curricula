@@ -28,6 +28,8 @@
     "bunyan": "^1.8.1",
     "bunyan-format": "^0.2.1",
     "chai": "^3.5.0",
+    "cl-auth-js": "0.0.1",
+    "cl-sdk-js-lo": "0.0.1",
     "deasync": "^0.1.7",
     "denodeify": "^1.2.1",
     "lodash": "^4.15.0",
