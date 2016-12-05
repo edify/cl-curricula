@@ -1,11 +1,23 @@
+
 stages:
   - test
+  - publish
 
-test-debug-js:
+before_script:
+  - curl -u$ARTIFACTORY_USERNAME:$ARTIFACTORY_PASSWORD https://edify.jfrog.io/edify/api/npm/auth > ~/.npmrc
+  - echo registry=http://edify.jfrog.io/edify/api/npm/npm-edify >> ~/.npmrc
+
+test-debug:
   image: node:6.9.1
   stage: test
   script:
-    - curl -u$ARTIFACTORY_USERNAME:$ARTIFACTORY_PASSWORD https://edify.jfrog.io/edify/api/npm/auth > ~/.npmrc
-    - echo registry=http://edify.jfrog.io/edify/api/npm/npm-edify >> ~/.npmrc
     - npm install
     - npm test
+
+release-docker:
+  image: node:6.9.1
+  stage: publish
+  only:
+    - master
+  script:
+    - echo "Docker-image publication pending..."
