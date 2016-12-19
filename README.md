@@ -49,6 +49,9 @@ $ node_modules/orientjs/bin/orientjs migrate up
 # **Build and deploy docker image**
 
 ```bash
+$ curl -u<USERNAME>:<PASSWORD> https://edify.jfrog.io/edify/api/npm/auth > ~/.npmrc
+$ rm -rf node_modules/
+$ npm install
 $ docker build -t cl-curricula .
 $ docker tag cl-curricula edify-dkr.jfrog.io/cl-curricula:SEMANTIC_VERSION
 $ docker login edify-dkr.jfrog.io
