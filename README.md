@@ -46,6 +46,16 @@ $ node_modules/orientjs/bin/orientjs migrate up
 ```
 
 
+# **Build and deploy docker image**
+
+```bash
+$ docker build -t cl-curricula .
+$ docker tag cl-curricula edify-dkr.jfrog.io/cl-curricula:SEMANTIC_VERSION
+$ docker login edify-dkr.jfrog.io
+$ docker push edify-dkr.jfrog.io/cl-curricula
+```
+
+
 # **Curriculum REST API Reference**
 
 This section covers the main concepts of the Common Library's Curriculum REST API. It will explain how the authentication works, as well as the available resources and their format. The allowed operations on the resorces are going to be detailed with command line examples using [cUrl](https://curl.haxx.se/docs/manpage.html).
@@ -91,13 +101,16 @@ $ chmod +x bin/sauthc1_cli
 3. Use the script by passing the required arguments:
 
 ```bash
-$ ./bin/sauthc1_cli --url https://localhost:8443/api/v1/learningObjectives \
+$ ./bin/sauthc1_cli --url http://localhost:8081/api/v1/curricula \
 --method POST \
 --body '{
-        "name": "LO Name",
-        "description": "LO Description",
-        "learningObjectiveList": []
-       }' \
+            "name": "curriculumName",
+            "title": "title",
+            "discipline": "discipline",
+            "description": "description",
+            "enabled": true,
+            "metadata": {}
+        }' \
 --id ${CL_API_CLIENT_ID} \
 --secret ${CL_API_CLIENT_SECRET}
 ```
@@ -106,7 +119,7 @@ The previous command will output a string:
 
 ```JSON
 { 
-    "Host": "localhost:8443",
+    "Host": "localhost:8081",
     "X-Stormpath-Date": "20160905T154832Z",
     "Authorization": "SAuthc1 sauthc1Id=5c4d6a3bdc68ffb02e3ce309964ac558/20160905/uYHxdluS6Q/sauthc1_request, sauthc1SignedHeaders=host;x-stormpath-date, sauthc1Signature=9111371712bdf41917303d638ac39c4d4b8099017a32704e9fc36911c4915f13" 
 }
@@ -116,15 +129,19 @@ Then, you can use those values to build a cUrl request:
 
 ```bash
 curl -k --request POST \
---header "Authorization: SAuthc1 sauthc1Id=5c4d6a3bdc68ffb02e3ce309964ac558/20160905/uYHxdluS6Q/sauthc1_request, sauthc1SignedHeaders=host;x-stormpath-date, sauthc1Signature=9111371712bdf41917303d638ac39c4d4b8099017a32704e9fc36911c4915f13" \
---header "X-Stormpath-Date: 20160905T154832Z" \
+--header "Authorization: SAuthc1 sauthc1Id=c4f58114f033bcc79b2759805a6c5961/20161219/07T0r01B9t/sauthc1_request, sauthc1SignedHeaders=host;x-stormpath-date, sauthc1Signature=98125c3cf81675c09ca9a4901c929c5a3a34df162aa8987b9b38c910a2b22c8a" \
+--header "X-Stormpath-Date: 20161219T193349Z" \
+--header "Host: localhost:8081" \
 --header "content-type: application/json" \
---url "https://localhost:8443/api/v1/learningObjectives" \
+--url "http://localhost:8081/api/v1/curricula" \
 --data '{
-        "name": "LO Name",
-        "description": "LO Description",
-        "learningObjectiveList": []
-       }'
+        "name": "curriculumName",
+        "title": "title",
+        "discipline": "discipline",
+        "description": "description",
+        "enabled": true,
+        "metadata": {}
+        }'
 ```
 
 # CRUD on resources
