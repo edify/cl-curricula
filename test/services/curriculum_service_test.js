@@ -43,7 +43,7 @@ const curriculumService = require('../../lib/services/curriculum_service');
 
 
 // Shared variables.
-var curriculum, curricula;
+var curriculum, curricula, learningObjective;
 
 before(function() {
     curriculum = {
@@ -62,6 +62,12 @@ before(function() {
             name: 'Curriculum2'
         }
     ];
+
+    learningObjective = {
+            "name": "objective3",
+            "description": "objective3 Description",
+            "url": "/learningObjectives/591c877be114c66bcf67c0a1"
+    };
 });
 
 describe('Find curriculum by id', function() {
@@ -393,3 +399,40 @@ describe('Find curriculum by learning objective name', function() {
 
 });
 
+
+describe('Find the linked learningObjectives for a specific curriculum', function() {
+
+    let queryMethod, queryString, queryResult;
+
+    beforeEach(function() {
+        queryMethod = sinon.stub(odbMock, 'query');
+        queryString = `SELECT learningObjectives FROM 
+                            (TRAVERSE OUT() FROM 
+                                (SELECT FROM Curriculum WHERE id = :id)) 
+                     WHERE @class= 'LearningObject'`;
+        queryResult = [{learningObjectives: [ learningObjective ]}]
+    });
+
+    afterEach(function () {
+        odbMock.query.restore();
+    });
+
+    it('Retrieves all the learningObjectives implicitly associated to a curriculum', function(done) {
+        queryMethod.returns(Promise.resolve(queryResult));
+        let queryParams = {params: {id: 'curriculumId'}};
+
+        curriculumService.getLinkedLearningObjectives('curriculumId').then(function(res) {
+            // Check methods invocation.
+            queryMethod.should.have.been.calledOnce;
+            queryMethod.should.have.been.calledWithExactly(queryString, queryParams);
+
+            // The result should be an array with 1 element, the test learningObjective.
+            JSON.stringify(res).should.be.equal(JSON.stringify([learningObjective]));
+
+            done()
+        }).catch(function(err) {
+            done(err)
+        })
+    });
+
+});

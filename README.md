@@ -219,8 +219,9 @@ http://localhost:8081/curricula/{id}
 - **title**: Curriculum's title.                                                (String)
 - **description**: Chunk of text describing the curriculum.                     (String)
 - **discipline**: Discipline (Optional).                                        (String)
-- **enabled**: If the curriculum is currently enabled                           (String)
+- **enabled**: If the curriculum is currently enabled                           (Boolean)
 - **metadata**: Curriculum's metadata.                                          (Object with properties)
+- **learningObjectives**: Curriculum's objectives.                              (List of LearningObjectives)
 
 
 Resource JSON example
@@ -246,11 +247,14 @@ Resource JSON example
         "isbn": "anyISBN",
         "price": 2000,
         "extraMetadata": ["extraMetadata1", "extraMetadata2"]
-    }
+    },
+    "learningObjectives": []
 }
 ```
 
 ## Curriculum Operations
+
+Next, you will see all the supported operations with working examples.
 
 ### Create a curriculum
 
@@ -290,7 +294,8 @@ curl -k --request POST \
             "isbn": "anyISBN",
             "price": 2000,
             "extraMetadata": ["extraMetadata1", "extraMetadata2"]
-        }
+        },
+        "learningObjectives": []
         }'
 ```
 
@@ -318,7 +323,8 @@ curl -k --request POST \
         "difficulty": "ANY",
         "language": "ENGLISH",
         "interactivityDegree": "ANY"
-    }
+    },
+    "learningObjectives": []
 }
 ```
 
@@ -331,6 +337,8 @@ curl -k --request POST \
 - **URL**: /curricula/{id}
 
 - **Request data:** None.
+
+- **Note:** If the resource does not exist, an empty json will be returned.
 
 - **Example Query:**
 
@@ -366,8 +374,53 @@ curl -k --request GET \
         "difficulty": "ANY",
         "language": "ENGLISH",
         "interactivityDegree": "ANY"
-    }
+    },
+    "learningObjectives": []
 }
+```
+
+---
+
+### Retrieve the LearningObjectives associated with a curriculum
+
+- **HTTP_METHOD**: GET
+
+- **URL**: /curricula/{id}/linkedLearningObjectives
+
+- **Request data:** None.
+
+- **Note:** If the resource does not exist, an empty list will be returned.
+
+- **Example Query:**
+
+```bash
+curl -k --request GET \
+--header "Authorization: SAuthc1 sauthc1Id=5c4d6a3bdc68ffb02e3ce309964ac558/20160905/8hcW7pqAMx/sauthc1_request, sauthc1SignedHeaders=host;x-stormpath-date, sauthc1Signature=1e84666356c28a6b029f899ef3969876292672f44abeee6f068d978420497b1e" \
+--header "content-type: application/json" \
+--header "X-Stormpath-Date: 20160905T153936Z" \
+--url "http://localhost:8081/api/v1/curricula/47c98e93-1709-4455-8303-096098513c1d/linkedLearningObjectives"
+```
+
+- **Example Response:**
+
+```json
+[
+    {
+        "name": "loi1",
+        "description": "desc",
+        "url": "/learningObjectives/32454hjh5454"
+    },
+    {
+        "name": "loi2",
+        "description": "desc",
+        "url": "/learningObjectives/32454hjh5454"
+    },
+    {
+        "name": "loi3",
+        "description": "desc",
+        "url": "/learningObjectives/32454hjh5454"
+    },
+]
 ```
 
 ---
@@ -442,6 +495,7 @@ curl -k --request GET \
             "language": "ENGLISH",
             "interactivityDegree": "ANY"
         },
+        "learningObjectives": []
     }],
     "firstPage": true,
     "lastPage": false,
@@ -500,7 +554,8 @@ curl -k --request GET \
             "isbn": "anyISBN",
             "price": 2000,
             "extraMetadata": ["extraMetadata1", "extraMetadata2"]
-        }
+        },
+        "learningObjectives": []
     }],
     "firstPage": true,
     "lastPage": true,
@@ -550,7 +605,13 @@ curl -k --request PUT \
             "isbn": "anyISBN",
             "price": 2000,
             "extraMetadata": ["extraMetadata1", "extraMetadata2"]
-        }
+        },
+        "learningObjectives": [
+            {
+                "name": "loi1",
+                "description": "desc"
+            }
+        ]
         }'
 ```
 
@@ -617,6 +678,9 @@ Note: When the {path/to/desired/item} is not present, the root folder will be re
 
       - **name**: LearningObject's name.                                              (String)
       - **title**: LearningObject's title.                                            (String)
+      - **learningObjectId**: LearningObject's id in cl-lo                            (String)
+      - **deleted**: If this flag is true, the lo was deleted in cl-lo                (Boolean)
+      - **updated**: If this flag is true, the lo was updated in cl-lo                (Boolean)
       - **url**: CL-LO MicroService reference.                                        (String)
       - **contentUrl**: CL-LO MicroService reference to the file.                     (String)
       - **learningObjectives**: List of learning Objectives.                          (Array of Objects)
@@ -628,15 +692,20 @@ Note: When the {path/to/desired/item} is not present, the root folder will be re
         {
             "name": "LOName",
             "title": "LearningObjectTitle",
+            "learningObjectId": "57e19c35185e1e8c93db6f61",
+            "updated": false,
+            "deleted": false,
             "url": "/learningObjects/57e19c35185e1e8c93db6f61",
             "contentUrl": "/learningObjects/57e19c35185e1e8c93db6f61/contents/57e19c35185e1e8c93db6f62/file/textandmaterials.html?refPath=57e19c35185e1e8c93db6f61/",
             "learningObjectives": [
                 {
                     "name": "LearningObjective1",
+                    "description": "desc",
                     "url": "/learningObjectives/id1"
                 },
                 {
                     "name": "LearningObjective2",
+                    "description": "desc",
                     "url": "/learningObjectives/id2"
                 }
             ]
@@ -705,15 +774,18 @@ curl -k --request POST \
 --data '{
         "name": "LOName",
         "title": "LearningObjectTitle",
+        "learningObjectId":, "57e19c35185e1e8c93db6f61",
         "url": "/learningObjects/57e19c35185e1e8c93db6f61",
         "contentUrl": "/learningObjects/57e19c35185e1e8c93db6f61/contents/57e19c35185e1e8c93db6f62/file/textandmaterials.html?refPath=57e19c35185e1e8c93db6f61/",
         "learningObjectives": [
             {
                 "name": "LearningObjective1",
+                "description": "desc",
                 "url": "/learningObjectives/id1"
             },
             {
                 "name": "LearningObjective2",
+                "description": "desc",
                 "url": "/learningObjectives/id2"
             }
         ]
@@ -727,15 +799,21 @@ curl -k --request POST \
     "id": "3c3fb308-00e5-4d28-8e54-536b59dd66f2",
     "name": "LOName",
     "title": "LearningObjectTitle",
+    "learningObjectId":, "57e19c35185e1e8c93db6f61",
+    "deleted": false,
+    "updated": false,
     "url": "/learningObjects/57e19c35185e1e8c93db6f61",
     "contentUrl": "/learningObjects/57e19c35185e1e8c93db6f61/contents/57e19c35185e1e8c93db6f62/file/textandmaterials.html?refPath=57e19c35185e1e8c93db6f61/",
     "learningObjectives": [{
-        "name": "LearningObjective1",
-        "url": "/learningObjectives/id1"
-    }, {
-        "name": "LearningObjective2",
-        "url": "/learningObjectives/id2"
-    }]
+       "name": "LearningObjective1",
+       "description": "desc",
+       "url": "/learningObjectives/id1"
+   },
+   {
+       "name": "LearningObjective2",
+       "description": "desc",
+       "url": "/learningObjectives/id2"
+   }]
 }
 ```
 
@@ -748,6 +826,8 @@ curl -k --request POST \
 - **URL**: /curricula/{id}/folders/path/{learningObjectPath}
 
 - **Request data:** None.
+
+- **Note:** If the resource does not exist, an empty json will be returned.
 
 - **Example Query (Getting the learning object subfolder200/materials/loName):**
 
@@ -766,13 +846,18 @@ curl -k --request GET \
     "id": "3c3fb308-00e5-4d28-8e54-536b59dd66f2",
     "name": "LOName",
     "title": "LearningObjectTitle",
+    "updated": false,
+    "deleted": false,
+    "learningObjectId": "57e19c35185e1e8c93db6f61",
     "url": "/learningObjects/57e19c35185e1e8c93db6f61",
     "contentUrl": "/learningObjects/57e19c35185e1e8c93db6f61/contents/57e19c35185e1e8c93db6f62/file/textandmaterials.html?refPath=57e19c35185e1e8c93db6f61/",
     "learningObjectives": [{
         "name": "LearningObjective1",
+        "description": "desc",
         "url": "/learningObjectives/id1"
     }, {
         "name": "LearningObjective2",
+        "description": "desc",
         "url": "/learningObjectives/id2"
     }]
 }
@@ -799,13 +884,18 @@ curl -k --request GET \
     "id": "3c3fb308-00e5-4d28-8e54-536b59dd66f2",
     "name": "LOName",
     "title": "LearningObjectTitle",
+    "learningObjectId": "57e19c35185e1e8c93db6f61",
+    "updated": false,
+    "deleted": false,
     "url": "/learningObjects/57e19c35185e1e8c93db6f61",
     "contentUrl": "/learningObjects/57e19c35185e1e8c93db6f61/contents/57e19c35185e1e8c93db6f62/file/textandmaterials.html?refPath=57e19c35185e1e8c93db6f61/",
     "learningObjectives": [{
         "name": "LearningObjective1",
+        "description": "desc",
         "url": "/learningObjectives/id1"
     }, {
         "name": "LearningObjective2",
+        "description": "desc",
         "url": "/learningObjectives/id2"
     }],
     "metadata": {
@@ -840,6 +930,8 @@ curl -k --request GET \
 - **URL**: /curricula/{id}/folders/path/{folderPath}
 
 - **Request data:** None.
+
+- **Note:** If the resource does not exist, an empty json will be returned.
 
 - **Example Query (Getting the folder root of the curriculum):**
 
@@ -897,39 +989,54 @@ curl -k --request GET \
         "id": "673dce16-0bf2-4b24-943e-57771dfc2d8c",
         "name": "lo1",
         "title": "LearningObjectTitle",
+        "learningObjectId": "57e19c35185e1e8c93db6f61",
+        "updated": false,
+        "deleted": false,
         "url": "/learningObjects/57e19c35185e1e8c93db6f61",
         "contentUrl": "/learningObjects/57e19c35185e1e8c93db6f61/contents/57e19c35185e1e8c93db6f62/file/textandmaterials.html?refPath=57e19c35185e1e8c93db6f61/",
         "learningObjectives": [{
             "name": "LearningObjective1",
+            "description": "desc",
             "url": "/learningObjectives/id1"
         }, {
             "name": "LearningObjective2",
+            "description": "desc",
             "url": "/learningObjectives/id2"
         }]
     }, {
         "id": "09f54e4a-716c-4786-b298-535df1fa7051",
         "name": "lo2",
         "title": "LearningObjectTitle",
+        "learningObjectId": "57e19c35185e1e8c93db6f61",
+        "updated": false,
+        "deleted": false,
         "url": "/learningObjects/57e19c35185e1e8c93db6f61",
         "contentUrl": "/learningObjects/57e19c35185e1e8c93db6f61/contents/57e19c35185e1e8c93db6f62/file/textandmaterials.html?refPath=57e19c35185e1e8c93db6f61/",
         "learningObjectives": [{
             "name": "LearningObjective1",
+            "description": "desc",
             "url": "/learningObjectives/id1"
         }, {
             "name": "LearningObjective2",
+            "description": "desc",
             "url": "/learningObjectives/id2"
         }]
     }, {
         "id": "a561e9bb-b159-46ed-b202-ba3ec9829ab3",
         "name": "lo3",
         "title": "LearningObjectTitle",
+        "learningObjectId": "57e19c35185e1e8c93db6f61",
+        "updated": false,
+        "deleted": false,
         "url": "/learningObjects/57e19c35185e1e8c93db6f61",
         "contentUrl": "/learningObjects/57e19c35185e1e8c93db6f61/contents/57e19c35185e1e8c93db6f62/file/textandmaterials.html?refPath=57e19c35185e1e8c93db6f61/",
         "learningObjectives": [{
             "name": "LearningObjective1",
+            "description": "desc",
             "url": "/learningObjectives/id1"
         }, {
             "name": "LearningObjective2",
+            "description": "desc",
             "url": "/learningObjectives/id2"
         }]
     }]
