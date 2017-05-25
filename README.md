@@ -30,9 +30,9 @@ $ export CL_REDIS_HOST=localhost
 $ export CL_REDIS_PORT=6379
 $ export CL_AUTH_PASSPHRASE=stringUsedInTheBootstrapper
 ```
-  - You can get CL_LO_API_ID and CL_LO_API_SECRET using the cl-auth/bootstrap script.
+  - You can get CL_LO_API_ID and CL_LO_API_SECRET using the cl-auth-js/bootstrap script.
 
-4.  Before executing the main file, you need to make sure that your redis and orientdb instances are running (check docker-compose file in the cl-core project).
+4.  Before executing the main file, you need to make sure that your redis and orientdb instances are running.
 
 5.  Execute the main file to start the server:
 ```bash
@@ -40,11 +40,7 @@ $ chmod +x bin/curricula
 $ ./bin/curricula
 ```
 
-6. Initialize the database scheme.
-```bash
-$ node_modules/orientjs/bin/orientjs migrate up
-```
-
+Note: If it was the first time executing the cl-curricula application. The orient database will be created and all the migrations will be applied.
 
 # **Build and deploy docker image**
 
@@ -676,7 +672,7 @@ Note: When the {path/to/desired/item} is not present, the root folder will be re
 
 -  LearningObject
 
-      - **name**: LearningObject's name.                                              (String)
+      - **name**: LearningObject's name.                                              (String) Must be a valid filename.
       - **title**: LearningObject's title.                                            (String)
       - **learningObjectId**: LearningObject's id in cl-lo                            (String)
       - **deleted**: If this flag is true, the lo was deleted in cl-lo                (Boolean)
