@@ -209,7 +209,7 @@ describe('Find item by path', function() {
                             WHERE @class='Folder'`;
 
             let loQueryParams = {params: {id: folder.id}};
-            let learningObjectsQuery = `SELECT id, name, title, url, contentUrl, learningObjectives 
+            let learningObjectsQuery = `SELECT id, name, title, url, contentUrl, learningObjectives, learningObjectId 
                         FROM (SELECT EXPAND(OUT()) FROM (SELECT FROM Folder WHERE id = :id)) 
                             WHERE @class='LearningObject'`;
 
