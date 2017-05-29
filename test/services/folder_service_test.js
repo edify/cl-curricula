@@ -68,6 +68,9 @@ before(function() {
 
     learningObject = {
         id: '1709-47c98e93-4455-8303-096098513c1d',
+        deleted: false,
+        updated: false,
+        learningObjectId: "57e19c35185e1e8c93db6f61",
         "name": "testLOName1",
         "title": "testLOTitle1",
         "url": "/learningObjects/57e19c35185e1e8c93db6f61",
@@ -79,6 +82,9 @@ before(function() {
     learningObjects = [
         {
             id: '1709-47c98e93-4455-8303-096098513c1d',
+            deleted: false,
+            updated: false,
+            learningObjectId: "57e19c35185e1e8c93db6f61",
             "name": "testLOName1",
             "title": "testLOTitle1",
             "url": "/learningObjects/57e19c35185e1e8c93db6f61",
@@ -87,6 +93,9 @@ before(function() {
         },
         {
             id: '47c98e93-4455-1709-8303-096098513c1d',
+            deleted: false,
+            updated: false,
+            learningObjectId: "57e19c35185e1e8c93db6f61",
             "name": "testLOName2",
             "title": "testLOTitle2",
             "url": "/learningObjects/57e19c35185e1e8c93db6f61",
@@ -200,7 +209,7 @@ describe('Find item by path', function() {
                             WHERE @class='Folder'`;
 
             let loQueryParams = {params: {id: folder.id}};
-            let learningObjectsQuery = `SELECT id, name, title, url, contentUrl, learningObjectives 
+            let learningObjectsQuery = `SELECT id, name, title, url, contentUrl, learningObjectives, learningObjectId 
                         FROM (SELECT EXPAND(OUT()) FROM (SELECT FROM Folder WHERE id = :id)) 
                             WHERE @class='LearningObject'`;
 
