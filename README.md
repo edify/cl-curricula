@@ -15,20 +15,23 @@ $ npm install
 
 3.  You must set some environment variables before running the application:
 ```bash
-$ export CL_CURRICULA_PORT=8081
-$ export CL_CURRICULA_AUDIT=true    # For development purposes, if you want to log every request.
-$ export CL_ODB_NAME=cl-curr-dev
-$ export CL_ODB_HOST=localhost
-$ export CL_ODB_PORT=2434
-$ export CL_ODB_ROOT_USR=root
-$ export CL_ODB_ROOT_PWD=root
-$ export CL_ODB_USR=cl_orient_user
-$ export CL_ODB_PWD=cl_orient_pwd
-$ export CL_LO_API_ID=apiKeyId
-$ export CL_LO_API_SECRET=apiSecretKey
-$ export CL_REDIS_HOST=localhost
-$ export CL_REDIS_PORT=6379
-$ export CL_AUTH_PASSPHRASE=stringUsedInTheBootstrapper
+export CL_CURRICULA_PORT=8081
+export CL_CURRICULA_AUDIT=true
+export CL_ODB_NAME=cl-curr-dev
+export CL_ODB_HOST=localhost
+export CL_ODB_PORT=2424
+export CL_ODB_ROOT_USR=root
+export CL_ODB_ROOT_PWD=root
+export CL_ODB_USR=cl_orient_user
+export CL_ODB_PWD=cl_orient_pwd
+export CL_AUTH_PASSPHRASE=passphrase
+export CL_LO_API_ID=
+export CL_LO_API_SECRET=
+export CL_REDIS_PORT=6379
+export CL_REDIS_HOST=localhost
+export CL_REDIS_PW=root
+export CL_LO_BASE_URL=http://localhost:8080
+export CL_LO_API_URL=/api/v1
 ```
   - You can get CL_LO_API_ID and CL_LO_API_SECRET using the cl-auth-js/bootstrap script.
 
